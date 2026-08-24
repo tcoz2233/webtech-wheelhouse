@@ -1,12 +1,16 @@
 # Wheelhouse — Bicycle Repair Shop System
 
-Wheelhouse is a web application designed to manage the day-to-day operations of a neighbourhood bicycle repair shop. It connects counter staff, mechanics, the shop owner, and customers through a unified platform to track repairs, manage service pricing, and ensure clear communication.
+Wheelhouse is a web application designed to manage the day-to-day operations of a neighbourhood bicycle repair shop. It connects counter staff, mechanics, the shop owner, and public customers to track repairs, manage service pricing, and streamline workshop communications.
 
-## Lab 3 Specification Documents
+## Project Roles
+* **Counter Staff:** Manages bike intake, customer details, and phone status inquiries.
+* **Mechanics:** Diagnoses repairs, records work notes, and updates service items.
+* **Shop Owner:** Monitors overdue repairs, updates the wall price list, and tracks shop performance.
+* **Public Customer:** Views standard service prices on the website.
 
-The core requirements and domain design for Wheelhouse are documented in the following files:
+## Specification Documents (Lab 3)
 
-* [User Stories & Acceptance Criteria](docs/user-stories.md) — The system requirements and completion criteria.
-* [Domain Model](docs/domain-model.md) — The relational ERD diagram, DBML schema, entity traceability, and lifecycle state machine.
-* [Architectural Decisions](docs/decisions.md) — Resolution of domain questions and edge cases.
-* [Wireframes & Navigation Graph](docs/wireframes.md) — Low-fidelity screen layouts and interaction paths.
+* [User Stories & Acceptance Criteria](docs/user-stories.md)
+* [Domain Model & Lifecycle](docs/domain-model.md)
+* [Architectural Decisions](docs/decisions.md)
+* [Wireframes & Navigation Graph](docs/wireframes.md)
