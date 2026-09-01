@@ -28,9 +28,8 @@ Bash
 bin/dev
 Open http://localhost:3000 in your browser.
 
-Documentation
-Project planning and architectural documents are located in the docs/ directory:
+## Documentation
 
-User Stories
-
-Domain Model
+Project planning and architectural documents are located in the `docs/` directory:
+* [User Stories](docs/user-stories.md)
+* [Domain Model](docs/domain-model.md)
