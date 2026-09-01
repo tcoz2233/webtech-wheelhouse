@@ -1,0 +1,23 @@
+<h1 class="mb-4">Standard Repair Services</h1>
+<p class="text-muted">Below is our official wall list of standard service prices. Final quotes may vary depending on physical inspection at intake.</p>
+
+<div class="table-responsive mt-4">
+  <table class="table table-striped table-hover border">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Service Name</th>
+        <th scope="col" class="text-end">Standard Price (USD)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @services.each_with_index do |service, index| %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td class="fw-semibold"><%= service[:name] %></td>
+          <td class="text-end fw-bold">$<%= sprintf('%.2f', service[:price]) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
