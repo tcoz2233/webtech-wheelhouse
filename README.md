@@ -1,24 +1,36 @@
-# README
+Wheelhouse is a web application for a local bicycle repair shop, built using Ruby on Rails and Bootstrap.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Prerequisites
 
-Things you may want to cover:
+* Ruby 3.2.0+
+* Rails 8.x
+* Node.js (v20+) & NPM
 
-* Ruby version
+## Setup & Running Locally
 
-* System dependencies
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/tcoz2233/webtech-wheelhouse.git](https://github.com/tcoz2233/webtech-wheelhouse.git)
+   cd webtech-wheelhouse
 
-* Configuration
+   Install dependencies:
 
-* Database creation
+Bash
+bundle install
+npm install
+Build CSS assets:
 
-* Database initialization
+Bash
+npm run build:css
+Start the development server:
 
-* How to run the test suite
+Bash
+bin/dev
+Open http://localhost:3000 in your browser.
 
-* Services (job queues, cache servers, search engines, etc.)
+Documentation
+Project planning and architectural documents are located in the docs/ directory:
 
-* Deployment instructions
+User Stories
 
-* ...
+Domain Model
