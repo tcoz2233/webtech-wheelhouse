@@ -1,0 +1,13 @@
+<% provide(:title, "All the mechanics") %>
+
+<h1 class="mb-4">Mechanics</h1>
+
+<% if @mechanics.any? %>
+  <div class="list-group">
+    <% @mechanics.each do |mechanic| %>
+      <%= link_to mechanic.name, mechanic_path(mechanic), class: "list-group-item list-group-item-action fw-bold" %>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-muted">There is no registered mechanics.</p>
+<% end %>

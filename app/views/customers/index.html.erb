@@ -1,0 +1,15 @@
+<% provide(:title, "All Clients") %>
+
+<h1 class="mb-4">Clients</h1>
+
+<% if @customers.any? %>
+  <ul class="list-group">
+    <% @customers.each do |customer| %>
+      <li class="list-group-item">
+        <%= link_to customer.name, customer_path(customer), class: "fw-bold text-decoration-none" %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="text-muted">There is no registered clients.</p>
+<% end %>

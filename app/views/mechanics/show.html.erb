@@ -1,0 +1,33 @@
+<% provide(:title, @mechanic.name) %>
+
+<div class="mb-3">
+  <%= link_to "← Volver a Mecánicos", mechanics_path, class: "btn btn-outline-secondary btn-sm" %>
+</div>
+
+<h1><%= @mechanic.name %></h1>
+
+<h3 class="mt-4">Reparaciones Asignadas</h3>
+<% if @mechanic.repairs.any? %>
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Bicicleta</th>
+        <th>Estado</th>
+        <th>Fecha Prometida</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @mechanic.repairs.each do |repair| %>
+        <tr>
+          <td><%= link_to "##{repair.id}", repair_path(repair), class: "fw-bold" %></td>
+          <td><%= link_to "#{repair.bike.brand} #{repair.bike.model}", bike_path(repair.bike) %></td>
+          <td><span class="badge bg-secondary"><%= repair.status %></span></td>
+          <td><%= l(repair.promised_on, format: :short) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="text-muted">Este mecánico no tiene reparaciones asignadas.</p>
+<% end %>

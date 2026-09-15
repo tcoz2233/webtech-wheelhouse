@@ -1,0 +1,15 @@
+<% provide(:title, @service.name) %>
+
+<div class="mb-3">
+  <%= link_to "← Volver a Servicios", services_path, class: "btn btn-outline-secondary btn-sm" %>
+</div>
+
+<h1><%= @service.name %></h1>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <p class="card-text">
+      <strong>Precio Base:</strong> <%= number_to_currency(@service.price, unit: "$", precision: 0) %>
+    </p>
+  </div>
+</div>

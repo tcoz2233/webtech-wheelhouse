@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_07_211147) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_14_231749) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_211147) do
     t.string "model", null: false
     t.string "serial_number", null: false
     t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_bikes_on_customer_id"
     t.index ["serial_number"], name: "index_bikes_on_serial_number", unique: true
   end
 
@@ -55,6 +56,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_211147) do
     t.date "promised_on", null: false
     t.string "status", default: "received", null: false
     t.datetime "updated_at", null: false
+    t.index ["bike_id"], name: "index_repairs_on_bike_id"
+    t.index ["mechanic_id"], name: "index_repairs_on_mechanic_id"
   end
 
   create_table "services", force: :cascade do |t|
@@ -65,4 +68,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_211147) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_services_on_name", unique: true
   end
+
+  add_foreign_key "bikes", "customers"
+  add_foreign_key "repairs", "bikes"
+  add_foreign_key "repairs", "mechanics"
 end
