@@ -1,9 +1,9 @@
 class BikesController < ApplicationController
   def index
-    @bikes = Bike.all
+    @bikes = Bike.includes(:customer).by_name
   end
 
   def show
-    @bike = Bike.find(params[:id])
+    @bike = Bike.includes(:customer, repairs: :mechanic).find(params[:id])
   end
 end

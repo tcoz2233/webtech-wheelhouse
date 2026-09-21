@@ -1,7 +1,7 @@
 <% provide(:title, @service.name) %>
 
 <div class="mb-3">
-  <%= link_to "← Volver a Servicios", services_path, class: "btn btn-outline-secondary btn-sm" %>
+  <%= link_to "← Back to Services", services_path, class: "btn btn-outline-secondary btn-sm" %>
 </div>
 
 <h1><%= @service.name %></h1>
@@ -9,7 +9,37 @@
 <div class="card mb-4">
   <div class="card-body">
     <p class="card-text">
-      <strong>Precio Base:</strong> <%= number_to_currency(@service.price, unit: "$", precision: 0) %>
+      <%# Corregido: current_price en lugar de price %>
+      <strong>Current Price:</strong> <%= number_to_currency(@service.current_price, unit: "$") %>
+    </p>
+    <p class="card-text">
+      <strong>Active:</strong> <%= @service.is_active ? "Yes" : "No" %>
     </p>
   </div>
 </div>
+
+<h3>Repairs Including This Service</h3>
+<% if @service.repairs.any? %>
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr>
+        <th>Repair ID</th>
+        <th>Bike</th>
+        <th>Customer</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @service.repairs.each do |repair| %>
+        <tr>
+          <td><%= link_to "##{repair.id}", repair_path(repair), class: "fw-bold" %></td>
+          <td><%= link_to "#{repair.bike.brand} #{repair.bike.model}", bike_path(repair.bike) %></td>
+          <td><%= link_to repair.bike.customer.name, customer_path(repair.bike.customer) %></td>
+          <td><span class="badge bg-secondary"><%= repair.status.humanize %></span></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="text-muted">This service has not been charged on any repairs yet.</p>
+<% end %>

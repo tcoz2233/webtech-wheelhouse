@@ -1,9 +1,9 @@
 class CustomersController < ApplicationController
   def index
-    @customers = Customer.all
+    @customers = Customer.by_name
   end
 
   def show
-    @customer = Customer.find(params[:id])
+    @customer = Customer.includes(bikes: :repairs).find(params[:id])
   end
 end

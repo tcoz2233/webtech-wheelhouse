@@ -1,34 +1,41 @@
-<% provide(:title, "Reparations list") %>
+<% provide(:title, "Repairs list") %>
 
-<h1 class="mb-4">Reparations</h1>
+<h1 class="mb-4">Repairs</h1>
 
 <% if @repairs.any? %>
   <table class="table align-middle">
     <thead>
       <tr>
         <th>ID</th>
-        <th>Bikes</th>
-        <th>Client</th>
+        <th>Bike</th>
+        <th>Customer</th>
         <th>Mechanic</th>
         <th>Status</th>
-        <th>Promised date</th>
+        <th>Promised Date</th>
       </tr>
     </thead>
     <tbody>
       <% @repairs.each do |repair| %>
-        <%# Criterio visual: marcar en rojo si la fecha prometida ya pasó y no se ha entregado %>
-        <% is_overdue = repair.promised_on < Date.today && repair.status != "delivered" %>
-        <tr class="<%= 'table-danger' if is_overdue %>">
+        <%# Requerimiento 5: Se usa el método del modelo overdue? sin comparar fechas en la vista %>
+        <tr class="<%= 'table-danger' if repair.overdue? %>">
           <td><%= link_to "##{repair.id}", repair_path(repair), class: "fw-bold" %></td>
           <td><%= link_to "#{repair.bike.brand} #{repair.bike.model}", bike_path(repair.bike) %></td>
           <td><%= link_to repair.bike.customer.name, customer_path(repair.bike.customer) %></td>
-          <td><%= repair.mechanic ? link_to(repair.mechanic.name, mechanic_path(repair.mechanic)) : "Sin asignar" %></td>
-          <td><span class="badge bg-secondary"><%= repair.status %></span></td>
-          <td><%= l(repair.promised_on, format: :short) %></td>
+          <td><%= repair.mechanic ? link_to(repair.mechanic.name, mechanic_path(repair.mechanic)) : "Unassigned" %></td>
+          <td>
+            <%# Requerimiento 4: Se formatea el enum sin hardcodear strings %>
+            <span class="badge bg-secondary"><%= repair.status.humanize %></span>
+          </td>
+          <td>
+            <%= l(repair.promised_on, format: :short) %>
+            <% if repair.overdue? %>
+              <span class="badge bg-danger ms-1">Overdue</span>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
   </table>
 <% else %>
-  <p class="text-muted">There is no reparations in the system.</p>
+  <p class="text-muted">There are no repairs in the system.</p>
 <% end %>

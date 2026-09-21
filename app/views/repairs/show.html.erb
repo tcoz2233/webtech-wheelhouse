@@ -1,47 +1,51 @@
-<% provide(:title, "Reparación ##{@repair.id}") %>
+<% provide(:title, "Repair ##{@repair.id}") %>
 
 <div class="mb-3">
-  <%= link_to "← Volver a Reparaciones", repairs_path, class: "btn btn-outline-secondary btn-sm" %>
+  <%= link_to "← Back to Repairs", repairs_path, class: "btn btn-outline-secondary btn-sm" %>
 </div>
 
-<h1>Reparación #<%= @repair.id %></h1>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1>Repair #<%= @repair.id %></h1>
+  <% if @repair.overdue? %>
+    <span class="badge bg-danger fs-6">Overdue</span>
+  <% end %>
+</div>
 
 <div class="card mb-4">
   <div class="card-body">
-    <p><strong>Bicicleta:</strong> <%= link_to "#{@repair.bike.brand} #{@repair.bike.model}", bike_path(@repair.bike) %></p>
-    <p><strong>Cliente:</strong> <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
-    <p><strong>Mecánico:</strong> <%= @repair.mechanic ? link_to(@repair.mechanic.name, mechanic_path(@repair.mechanic)) : "Sin asignar" %></p>
-    <p><strong>Estado:</strong> <%= @repair.status %></p>
-    <p><strong>Prometida para:</strong> <%= l(@repair.promised_on, format: :long) %></p>
+    <p><strong>Bike:</strong> <%= link_to "#{@repair.bike.brand} #{@repair.bike.model}", bike_path(@repair.bike) %></p>
+    <p><strong>Customer:</strong> <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
+    <p><strong>Mechanic:</strong> <%= @repair.mechanic ? link_to(@repair.mechanic.name, mechanic_path(@repair.mechanic)) : "Unassigned" %></p>
+    <p><strong>Status:</strong> <span class="badge bg-secondary"><%= @repair.status.humanize %></span></p>
+    <p><strong>Promised On:</strong> <%= l(@repair.promised_on, format: :long) %></p>
   </div>
 </div>
 
-<h3>Servicios Cobrados</h3>
-<% if @repair.repair_line_items.any? %>
-  <table class="table table-sm">
+<h3>Services Charged</h3>
+<% if @repair.repair_services.any? %>
+  <table class="table table-sm align-middle">
     <thead>
       <tr>
-        <th>Servicio</th>
-        <th class="text-end">Precio Cobrado</th>
+        <th>Service</th>
+        <th class="text-end">Price Charged</th>
       </tr>
     </thead>
     <tbody>
-      <% total = 0 %>
-      <% @repair.repair_line_items.each do |item| %>
-        <% total += item.price %>
+      <% @repair.repair_services.each do |line| %>
         <tr>
-          <td><%= link_to item.service.name, service_path(item.service) %></td>
-          <td class="text-end"><%= number_to_currency(item.price, unit: "$", precision: 0) %></td>
+          <td><%= link_to line.service.name, service_path(line.service) %></td>
+          <td class="text-end"><%= number_to_currency(line.price_charged, unit: "$") %></td>
         </tr>
       <% end %>
     </tbody>
     <tfoot>
       <tr class="fw-bold">
         <td>Total</td>
-        <td class="text-end"><%= number_to_currency(total, unit: "$", precision: 0) %></td>
+        <%# Requerimiento 5: Invocamos el método total definido en el modelo Repair %>
+        <td class="text-end"><%= number_to_currency(@repair.total, unit: "$") %></td>
       </tr>
     </tfoot>
   </table>
 <% else %>
-  <p class="text-muted">Esta reparación no posee servicios asociados.</p>
+  <p class="text-muted">No services associated with this repair order.</p>
 <% end %>

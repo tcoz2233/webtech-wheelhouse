@@ -1,9 +1,9 @@
 class MechanicsController < ApplicationController
   def index
-    @mechanics = Mechanic.all
+    @mechanics = Mechanic.by_name
   end
 
   def show
-    @mechanic = Mechanic.find(params[:id])
+    @mechanic = Mechanic.includes(repairs: :bike).find(params[:id])
   end
 end
