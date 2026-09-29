@@ -6,19 +6,32 @@ Wheelhouse is a Ruby on Rails application for managing bike repairs, customers, 
 
 1. **Clone the repository:**
    ```bash
-   git clone <YOUR_REPOSITORY_URL>
+   git clone [https://github.com/tcoz2233/webtech-wheelhouse.git](https://github.com/tcoz2233/webtech-wheelhouse.git)
    cd webtech-wheelhouse
 Install dependencies and setup database:
 
-Bash
-bin/setup
-(Or alternatively: bundle install followed by bin/rails db:prepare or bin/rails db:reset)
 
+bundle install
+bin/rails db:prepare
+# or for a full seed reset:
+bin/rails db:reset
 Start the development server:
 
-Bash
+
 bin/dev
 # or
 bin/rails server
 Access the application:
 Open http://localhost:3000 in your browser.
+
+
+---
+
+### Pasos finales para la entrega
+
+Una vez guardado el `README.md`, ejecuta en tu terminal:
+
+```bash
+git add README.md
+git commit -m "Update README with exact repository URL and setup steps"
+git push origin main

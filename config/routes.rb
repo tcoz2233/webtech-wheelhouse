@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
-  root "bikes#index"
+  root "repairs#index"
 
   resources :customers
   resources :bikes
-  resources :repairs
-  resources :mechanics
   resources :services
+  resources :mechanics 
+  resources :repairs
 end

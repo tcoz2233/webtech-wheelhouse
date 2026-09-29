@@ -23,3 +23,5 @@
 <% else %>
   <p class="text-muted">This client has no registered bikes.</p>
 <% end %>
+<%= link_to "Add Bike for this Customer", new_bike_path(customer_id: @customer.id), class: "btn btn-sm btn-outline-primary" %>
+<%= link_to "Delete", customer_path(@customer), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete customer '#{@customer.name}'?" }, class: "btn btn-danger" %>

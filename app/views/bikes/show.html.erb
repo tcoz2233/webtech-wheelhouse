@@ -25,3 +25,5 @@
 <% else %>
   <p class="text-muted">Esta bicicleta no tiene reparaciones registradas.</p>
 <% end %>
+<%= link_to "New Repair for this Bike", new_repair_path(bike_id: @bike.id), class: "btn btn-sm btn-outline-primary" %>
+<%= link_to "Delete", customer_path(@customer), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete customer '#{@customer.name}'?" }, class: "btn btn-danger" %>

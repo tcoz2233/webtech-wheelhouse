@@ -1,0 +1,66 @@
+<%= form_with(model: repair, local: true) do |f| %>
+  <%= render 'shared/errors', object: repair %>
+
+  <div class="mb-3">
+    <%= f.label :bike_id, "Bike", class: "form-label" %>
+    <%= f.collection_select :bike_id, Bike.by_name, :id, ->(b) { "#{b.brand} #{b.model} (#{b.serial_number})" }, { prompt: "Select Bike" }, { class: "form-select #{'is-invalid' if repair.errors[:bike_id].any?}" } %>
+    <% repair.errors[:bike_id].each do |error| %>
+      <div class="invalid-feedback"><%= error %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :mechanic_id, "Mechanic (Optional)", class: "form-label" %>
+    <%= f.collection_select :mechanic_id, Mechanic.by_name, :id, :name, { include_blank: "Unassigned" }, { class: "form-select #{'is-invalid' if repair.errors[:mechanic_id].any?}" } %>
+    <% repair.errors[:mechanic_id].each do |error| %>
+      <div class="invalid-feedback"><%= error %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :status, class: "form-label" %>
+    <%= f.select :status, Repair.statuses.keys.map { |s| [s.humanize, s] }, {}, { class: "form-select #{'is-invalid' if repair.errors[:status].any?}" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :promised_on, "Promised Date", class: "form-label" %>
+    <%= f.date_field :promised_on, class: "form-control #{'is-invalid' if repair.errors[:promised_on].any?}" %>
+    <% repair.errors[:promised_on].each do |error| %>
+      <div class="invalid-feedback"><%= error %></div>
+    <% end %>
+  </div>
+
+  <hr class="my-4">
+
+  <h4>Services Charged</h4>
+  <p class="text-muted small">Select services to charge for this repair. Blank lines are ignored.</p>
+
+  <%= f.fields_for :repair_services do |rs_form| %>
+    <div class="row align-items-center mb-2 p-2 border rounded bg-light">
+      <div class="col-md-6">
+        <%= rs_form.label :service_id, "Service", class: "form-label small" %>
+        <%= rs_form.collection_select :service_id, Service.active.by_name, :id, :name, { include_blank: "-- Select Service --" }, { class: "form-select" } %>
+      </div>
+      <div class="col-md-4">
+        <%= rs_form.label :price_charged, "Price Charged ($)", class: "form-label small" %>
+        <%= rs_form.number_field :price_charged, step: "0.01", class: "form-control #{'is-invalid' if rs_form.object.errors[:price_charged].any?}" %>
+        <% rs_form.object.errors[:price_charged].each do |err| %>
+          <div class="invalid-feedback"><%= err %></div>
+        <% end %>
+      </div>
+      <% if rs_form.object.persisted? %>
+        <div class="col-md-2 mt-4">
+          <div class="form-check">
+            <%= rs_form.check_box :_destroy, class: "form-check-input" %>
+            <%= rs_form.label :_destroy, "Remove", class: "form-check-label text-danger" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="mt-4 d-flex gap-2">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", repair.persisted? ? repair_path(repair) : repairs_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

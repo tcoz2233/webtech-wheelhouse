@@ -31,3 +31,4 @@
 <% else %>
   <p class="text-muted">Este mecánico no tiene reparaciones asignadas.</p>
 <% end %>
+<%= link_to "Delete", customer_path(@customer), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete customer '#{@customer.name}'?" }, class: "btn btn-danger" %>
