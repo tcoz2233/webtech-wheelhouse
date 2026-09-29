@@ -2,7 +2,7 @@ class Bike < ApplicationRecord
   belongs_to :customer
   has_many :repairs, dependent: :destroy
 
-  validates :brand, :model, :serial_number, presence: true
+  validates :brand, :model, :serial_number, :color, presence: true
   validates :serial_number, uniqueness: { case_sensitive: false }
 
   before_validation :normalize_serial_number

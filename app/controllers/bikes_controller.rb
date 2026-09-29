@@ -6,8 +6,8 @@ class BikesController < ApplicationController
   end
 
   def show
+    @bike
   end
-
   def new
     @bike = Bike.new(customer_id: params[:customer_id])
   end
@@ -49,7 +49,7 @@ class BikesController < ApplicationController
   end
 
   def bike_params
-    params.expect(bike: [:brand, :model, :serial_number, :customer_id])
+    params.expect(bike: [:brand, :model, :serial_number, :color, :customer_id])
   rescue ActionController::ParameterMissing
     head :bad_request
   end
