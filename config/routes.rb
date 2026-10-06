@@ -5,5 +5,7 @@ Rails.application.routes.draw do
   resources :bikes
   resources :services
   resources :mechanics 
-  resources :repairs
+  resources :repairs do
+    resources :photos, only: [:destroy], module: :repairs
+  end
 end

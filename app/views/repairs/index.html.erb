@@ -1,6 +1,8 @@
-<% provide(:title, "Repairs list") %>
 
-<h1 class="mb-4">Repairs</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Repairs</h1>
+  <%= link_to "New Repair", new_repair_path, class: "btn btn-primary" %>
+</div>
 
 <% if @repairs.any? %>
   <table class="table align-middle">
@@ -24,7 +26,7 @@
           <td><%= repair.mechanic ? link_to(repair.mechanic.name, mechanic_path(repair.mechanic)) : "Unassigned" %></td>
           <td>
             <%# Requerimiento 4: Se formatea el enum sin hardcodear strings %>
-            <span class="badge bg-secondary"><%= repair.status.humanize %></span>
+            <span class="badge bg-secondary"><%= repair.status&.humanize %></span>
           </td>
           <td>
             <%= l(repair.promised_on, format: :short) %>

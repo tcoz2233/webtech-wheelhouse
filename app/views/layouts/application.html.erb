@@ -6,8 +6,11 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <!-- Carga del bundle de estilos de Bootstrap -->
     <%= stylesheet_link_tag "application.bootstrap", "data-turbo-track": "reload" %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+
+    <!-- Importmap JS (incluye Action Text y Trix sin duplicar bundles) -->
+    <%= javascript_importmap_tags %>
   </head>
 
   <body class="d-flex flex-column min-vh-100">
@@ -43,7 +46,7 @@
     </nav>
 
     <main class="container my-4 flex-grow-1">
-      <%# Renderizado de alertas Flash requeridas por el Lab 8 %>
+      <%# Renderizado de alertas Flash %>
       <% flash.each do |type, message| %>
         <% alert_class = case type.to_sym
            when :notice then "alert-success"

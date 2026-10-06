@@ -6,7 +6,7 @@
 
 <div class="d-flex align-items-center justify-content-between mb-3">
   <h1>Repair #<%= @repair.id %></h1>
-  <% if @repair.overdue? %>
+  <% if @repair.respond_to?(:overdue?) && @repair.overdue? %>
     <span class="badge bg-danger fs-6">Overdue</span>
   <% end %>
 </div>
@@ -17,7 +17,45 @@
     <p><strong>Customer:</strong> <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
     <p><strong>Mechanic:</strong> <%= @repair.mechanic ? link_to(@repair.mechanic.name, mechanic_path(@repair.mechanic)) : "Unassigned" %></p>
     <p><strong>Status:</strong> <span class="badge bg-secondary"><%= @repair.status.humanize %></span></p>
-    <p><strong>Promised On:</strong> <%= l(@repair.promised_on, format: :long) %></p>
+    <p><strong>Promised On:</strong> <%= l(@repair.promised_on, format: :long) if @repair.promised_on %></p>
+  </div>
+</div>
+
+<div class="mb-4">
+  <h3>Diagnosis</h3>
+  <% if @repair.diagnosis.present? %>
+    <div class="trix-content border rounded p-3 bg-light">
+      <%= @repair.diagnosis %>
+    </div>
+  <% else %>
+    <p class="text-muted">No diagnosis provided.</p>
+  <% end %>
+</div>
+
+<!-- Requerimiento 2 y 3: Fotos de Recepción y Eliminación Individual -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="h5 mb-0">Intake Photos</h3>
+  </div>
+  <div class="card-body">
+    <% if @repair.photos.attached? %>
+      <div class="row g-3">
+        <% @repair.photos.each do |photo| %>
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 shadow-sm">
+              <%= link_to url_for(photo), target: "_blank", title: "View full size" do %>
+                <%= image_tag photo.variant(:large), alt: "#{@repair.bike.brand} #{@repair.bike.model} - Repair ##{@repair.id}", class: "card-img-top object-fit-cover", style: "height: 180px;" %>
+              <% end %>
+              <div class="card-body p-2 text-center bg-light">
+                <%= link_to "Delete Photo", repair_photo_path(@repair, photo), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to remove this photo?" }, class: "btn btn-sm btn-outline-danger w-100" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted mb-0">No intake photos attached to this repair.</p>
+    <% end %>
   </div>
 </div>
 
@@ -41,7 +79,6 @@
     <tfoot>
       <tr class="fw-bold">
         <td>Total</td>
-        <%# Requerimiento 5: Invocamos el método total definido en el modelo Repair %>
         <td class="text-end"><%= number_to_currency(@repair.total, unit: "$") %></td>
       </tr>
     </tfoot>
@@ -49,4 +86,8 @@
 <% else %>
   <p class="text-muted">No services associated with this repair order.</p>
 <% end %>
-<%= link_to "Delete", customer_path(@customer), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete customer '#{@customer.name}'?" }, class: "btn btn-danger" %>
+
+<div class="mt-4 d-flex gap-2">
+  <%= link_to "Edit Repair", edit_repair_path(@repair), class: "btn btn-primary" %>
+  <%= link_to "Delete Repair", repair_path(@repair), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete Repair ##{@repair.id}?" }, class: "btn btn-danger" %>
+</div>

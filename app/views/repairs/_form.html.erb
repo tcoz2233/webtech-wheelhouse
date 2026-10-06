@@ -30,6 +30,19 @@
     <% end %>
   </div>
 
+  <div class="mb-3">
+    <%= f.label :photos, "Intake Photos", class: "form-label" %>
+    <%= f.file_field :photos, multiple: true, accept: "image/jpeg,image/png,image/webp", class: "form-control #{'is-invalid' if repair.errors[:photos].any?}" %>
+    <% repair.errors[:photos].each do |error| %>
+      <div class="invalid-feedback"><%= error %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :diagnosis, "Diagnosis", class: "form-label" %>
+    <%= f.rich_text_area :diagnosis, class: "form-control" %>
+  </div>
+
   <hr class="my-4">
 
   <h4>Services Charged</h4>
