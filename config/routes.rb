@@ -8,4 +8,11 @@ Rails.application.routes.draw do
   resources :repairs do
     resources :photos, only: [:destroy], module: :repairs
   end
+
+  namespace :api do
+    namespace :v1 do
+      resources :services, only: [:index, :show, :create]
+      resources :repairs, only: [:index, :show]
+    end
+  end
 end
