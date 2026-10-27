@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_06_202422) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_133958) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,8 +94,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_202422) do
     t.date "promised_on", null: false
     t.string "status", default: "received", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.index ["bike_id"], name: "index_repairs_on_bike_id"
     t.index ["mechanic_id"], name: "index_repairs_on_mechanic_id"
+    t.index ["user_id"], name: "index_repairs_on_user_id"
   end
 
   create_table "services", force: :cascade do |t|
@@ -107,9 +109,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_202422) do
     t.index ["name"], name: "index_services_on_name", unique: true
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.bigint "mechanic_id"
+    t.string "password_digest", null: false
+    t.string "role", default: "counter", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_lower_email_address", unique: true
+    t.index ["mechanic_id"], name: "index_users_on_mechanic_id", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bikes", "customers"
   add_foreign_key "repairs", "bikes"
   add_foreign_key "repairs", "mechanics"
+  add_foreign_key "repairs", "users"
+  add_foreign_key "sessions", "users"
+  add_foreign_key "users", "mechanics"
 end

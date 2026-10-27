@@ -1,18 +1,20 @@
 Rails.application.routes.draw do
-  root "repairs#index"
+  resource :session
+  resource :registration, only: [:new, :create]
+  resources :passwords, param: :token
 
+  resources :services
+  resources :repairs
   resources :customers
   resources :bikes
-  resources :services
-  resources :mechanics 
-  resources :repairs do
-    resources :photos, only: [:destroy], module: :repairs
-  end
+  resources :mechanics
 
   namespace :api do
     namespace :v1 do
-      resources :services, only: [:index, :show, :create]
+      resources :services, only: [:index, :show]
       resources :repairs, only: [:index, :show]
     end
   end
+
+  root "repairs#index"
 end

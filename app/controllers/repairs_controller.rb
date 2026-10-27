@@ -2,11 +2,7 @@ class RepairsController < ApplicationController
   before_action :set_repair, only: [:show, :edit, :update, :destroy]
 
   def index
-    # Requerimiento 8: Preloading para evitar N+1
-    @repairs = Repair.includes(:bike, :mechanic)
-                     .with_attached_photos
-                     .with_all_rich_text
-                     .order(created_at: :desc)
+    @repairs = Repair.includes(:bike, :mechanic, :user).all
   end
 
   def show
@@ -16,8 +12,13 @@ class RepairsController < ApplicationController
     @repair = Repair.new
   end
 
+  def edit
+  end
+
   def create
     @repair = Repair.new(repair_params)
+    @repair.user = Current.user
+
     if @repair.save
       redirect_to @repair, notice: "Repair created successfully."
     else
@@ -25,16 +26,8 @@ class RepairsController < ApplicationController
     end
   end
 
-  def edit
-  end
-
   def update
-    # Requerimiento 3: Añadir fotos sin borrar las actuales
-    if params[:repair][:photos].present?
-      @repair.photos.attach(params[:repair][:photos])
-    end
-
-    if @repair.update(repair_params.except(:photos))
+    if @repair.update(repair_params)
       redirect_to @repair, notice: "Repair updated successfully."
     else
       render :edit, status: :unprocessable_entity
@@ -43,7 +36,7 @@ class RepairsController < ApplicationController
 
   def destroy
     @repair.destroy
-    redirect_to repairs_path, notice: "Repair deleted successfully."
+    redirect_to repairs_path, status: :see_other, notice: "Repair deleted successfully."
   end
 
   private
@@ -53,6 +46,6 @@ class RepairsController < ApplicationController
   end
 
   def repair_params
-    params.require(:repair).permit(:bike_id, :mechanic_id, :status, :diagnosis, photos: [])
+    params.expect(repair: [:bike_id, :mechanic_id, :promised_on, :status, :customer_agreed])
   end
 end
