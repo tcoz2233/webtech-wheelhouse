@@ -4,10 +4,12 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
 
   resources :services
-  resources :repairs
+  resources :repairs do
+    resources :photos, only: :destroy, controller: "repairs/photos"
+  end
   resources :customers
   resources :bikes
-  resources :mechanics
+  resources :mechanics, only: [:index, :show]
 
   namespace :api do
     namespace :v1 do

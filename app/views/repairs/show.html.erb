@@ -13,9 +13,9 @@
 
 <div class="card mb-4">
   <div class="card-body">
-    <p><strong>Bike:</strong> <%= link_to "#{@repair.bike.brand} #{@repair.bike.model}", bike_path(@repair.bike) %></p>
-    <p><strong>Customer:</strong> <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
-    <p><strong>Mechanic:</strong> <%= @repair.mechanic ? link_to(@repair.mechanic.name, mechanic_path(@repair.mechanic)) : "Unassigned" %></p>
+    <p><strong>Bike:</strong> <%= link_to_if policy(@repair.bike).show?, "#{@repair.bike.brand} #{@repair.bike.model}", bike_path(@repair.bike) %></p>
+    <p><strong>Customer:</strong> <%= link_to_if policy(@repair.bike.customer).show?, @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
+    <p><strong>Mechanic:</strong> <%= @repair.mechanic ? link_to_if(policy(@repair.mechanic).show?, @repair.mechanic.name, mechanic_path(@repair.mechanic)) : "Unassigned" %></p>
     <p><strong>Status:</strong> <span class="badge bg-secondary"><%= @repair.status.humanize %></span></p>
     <p><strong>Promised On:</strong> <%= l(@repair.promised_on, format: :long) if @repair.promised_on %></p>
   </div>
@@ -46,9 +46,11 @@
               <%= link_to url_for(photo), target: "_blank", title: "View full size" do %>
                 <%= image_tag photo.variant(:large), alt: "#{@repair.bike.brand} #{@repair.bike.model} - Repair ##{@repair.id}", class: "card-img-top object-fit-cover", style: "height: 180px;" %>
               <% end %>
-              <div class="card-body p-2 text-center bg-light">
-                <%= link_to "Delete Photo", repair_photo_path(@repair, photo), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to remove this photo?" }, class: "btn btn-sm btn-outline-danger w-100" %>
-              </div>
+              <% if policy(@repair).update? %>
+                <div class="card-body p-2 text-center bg-light">
+                  <%= link_to "Delete Photo", repair_photo_path(@repair, photo), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to remove this photo?" }, class: "btn btn-sm btn-outline-danger w-100" %>
+                </div>
+              <% end %>
             </div>
           </div>
         <% end %>
@@ -88,6 +90,10 @@
 <% end %>
 
 <div class="mt-4 d-flex gap-2">
-  <%= link_to "Edit Repair", edit_repair_path(@repair), class: "btn btn-primary" %>
-  <%= link_to "Delete Repair", repair_path(@repair), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete Repair ##{@repair.id}?" }, class: "btn btn-danger" %>
+  <% if policy(@repair).update? %>
+    <%= link_to "Edit Repair", edit_repair_path(@repair), class: "btn btn-primary" %>
+  <% end %>
+  <% if policy(@repair).destroy? %>
+    <%= link_to "Delete Repair", repair_path(@repair), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete Repair ##{@repair.id}?" }, class: "btn btn-danger" %>
+  <% end %>
 </div>

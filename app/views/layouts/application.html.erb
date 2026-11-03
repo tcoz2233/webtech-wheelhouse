@@ -21,21 +21,31 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <%= link_to "Customers", customers_path, class: "nav-link #{'active' if current_page?(customers_path)}" %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Bikes", bikes_path, class: "nav-link #{'active' if current_page?(bikes_path)}" %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Mechanics", mechanics_path, class: "nav-link #{'active' if current_page?(mechanics_path)}" %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Repairs", repairs_path, class: "nav-link #{'active' if current_page?(repairs_path)}" %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Services", services_path, class: "nav-link #{'active' if current_page?(services_path)}" %>
-            </li>
+            <% if policy(Customer).index? %>
+              <li class="nav-item">
+                <%= link_to "Customers", customers_path, class: "nav-link #{'active' if current_page?(customers_path)}" %>
+              </li>
+            <% end %>
+            <% if policy(Bike).index? %>
+              <li class="nav-item">
+                <%= link_to "Bikes", bikes_path, class: "nav-link #{'active' if current_page?(bikes_path)}" %>
+              </li>
+            <% end %>
+            <% if policy(Mechanic).index? %>
+              <li class="nav-item">
+                <%= link_to "Mechanics", mechanics_path, class: "nav-link #{'active' if current_page?(mechanics_path)}" %>
+              </li>
+            <% end %>
+            <% if policy(Repair).index? %>
+              <li class="nav-item">
+                <%= link_to "Repairs", repairs_path, class: "nav-link #{'active' if current_page?(repairs_path)}" %>
+              </li>
+            <% end %>
+            <% if policy(Service).index? %>
+              <li class="nav-item">
+                <%= link_to "Services", services_path, class: "nav-link #{'active' if current_page?(services_path)}" %>
+              </li>
+            <% end %>
           </ul>
 
           <ul class="navbar-nav ms-auto">

@@ -19,7 +19,7 @@
 </div>
 
 <h3>Repairs Including This Service</h3>
-<% if @service.repairs.any? %>
+<% if @repairs.any? %>
   <table class="table table-sm align-middle">
     <thead>
       <tr>
@@ -30,11 +30,11 @@
       </tr>
     </thead>
     <tbody>
-      <% @service.repairs.each do |repair| %>
+      <% @repairs.each do |repair| %>
         <tr>
-          <td><%= link_to "##{repair.id}", repair_path(repair), class: "fw-bold" %></td>
-          <td><%= link_to "#{repair.bike.brand} #{repair.bike.model}", bike_path(repair.bike) %></td>
-          <td><%= link_to repair.bike.customer.name, customer_path(repair.bike.customer) %></td>
+          <td><%= link_to_if policy(repair).show?, "##{repair.id}", repair_path(repair), class: "fw-bold" %></td>
+          <td><%= link_to_if policy(repair.bike).show?, "#{repair.bike.brand} #{repair.bike.model}", bike_path(repair.bike) %></td>
+          <td><%= link_to_if policy(repair.bike.customer).show?, repair.bike.customer.name, customer_path(repair.bike.customer) %></td>
           <td><span class="badge bg-secondary"><%= repair.status.humanize %></span></td>
         </tr>
       <% end %>
@@ -43,4 +43,9 @@
 <% else %>
   <p class="text-muted">This service has not been charged on any repairs yet.</p>
 <% end %>
-<%= link_to "Delete", customer_path(@customer), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete customer '#{@customer.name}'?" }, class: "btn btn-danger" %>
+<% if policy(@service).update? %>
+  <%= link_to "Edit", edit_service_path(@service), class: "btn btn-primary" %>
+<% end %>
+<% if policy(@service).destroy? %>
+  <%= link_to "Delete", service_path(@service), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete service '#{@service.name}'?" }, class: "btn btn-danger" %>
+<% end %>

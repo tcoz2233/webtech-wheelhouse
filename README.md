@@ -1,56 +1,81 @@
 # Webtech Wheelhouse — Workshop Management System
 
-Wheelhouse is a Ruby on Rails application for managing bike repairs, customers, mechanics, and services. It provides both a web UI and a versioned JSON API (`/api/v1`) for external integration.
+Wheelhouse is a Ruby on Rails application for managing bike repairs, customers, mechanics and
+services. It has a web UI, with accounts and roles (Lab 11) and authorization with Pundit (Lab 12),
+and a versioned JSON API under `/api/v1`.
 
-## Setup Instructions
+## Requirements
 
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/tcoz2233/webtech-wheelhouse.git](https://github.com/tcoz2233/webtech-wheelhouse.git)
-   cd webtech-wheelhouse
-Install dependencies and setup database:
+* Ruby **3.2.0** (see `.ruby-version`)
+* PostgreSQL, running locally and accepting connections from your user
+* Node.js 18+ and npm (the CSS is built with Sass and Bootstrap)
 
-bundle install
-bin/rails db:prepare
-bin/rails db:seed
-Start the development server:
+## Get it running
 
-bin/rails server
-Access the web application at http://localhost:3000.
+```bash
+git clone https://github.com/tcoz2233/webtech-wheelhouse.git
+cd webtech-wheelhouse
 
-Lab 11: Accounts & Authentication
-Development Seed Accounts
-The application includes pre-configured accounts in development:
+bundle install                 # Ruby gems
+npm install                    # Bootstrap and Sass
 
-Owner: owner@wheelhouse.cl / Password: passwordowner123
+bin/rails db:prepare           # creates the database and loads the schema
+bin/rails db:seed              # demo data and accounts (safe to run again)
 
-Counter: counter@wheelhouse.cl / Password: passwordcounter123
+bin/dev                        # starts the server and the CSS build
+```
 
-Mechanic: mechanic1@wheelhouse.cl / Password: passwordmechanic1
+Open <http://localhost:3000> and sign in with one of the accounts below.
 
-Orphan Account: orphan@wheelhouse.cl / Password: passwordorphan123
+To start again from an empty database: `bin/rails db:reset`.
 
-Development Emails
-In development, application emails (welcome emails and password resets) are handled locally using letter_opener. When an email is sent, it opens automatically in your browser or can be accessed through the rails mailer previews at http://localhost:3000/rails/mailers.
+## Seed accounts
 
-Lab 10: API Integration & Setup
-The application provides a versioned JSON API under /api/v1.
+Every account is created by `bin/rails db:seed`. What each role may do is written, action by action,
+in [docs/permissions.md](docs/permissions.md).
 
-API Local Port: The API runs locally on port 3000 (http://localhost:3000).
+| Account | Password | Role | What it can do |
+|---------|----------|------|----------------|
+| `owner@wheelhouse.cl` | `passwordowner123` | Owner | Everything: all repairs (also handed-back ones), customers, bikes, the price list and the staff. See [permissions](docs/permissions.md). |
+| `counter@wheelhouse.cl` | `passwordcounter123` | Counter | Takes bikes in and talks to customers: creates, edits and reads customers, bikes and repairs (a handed-back repair only the owner edits); reads services and staff; deletes nothing. See [permissions](docs/permissions.md). |
+| `mechanic1@wheelhouse.cl` | `passwordmechanic1` | Mechanic (Pedro) | Reads only the repairs assigned to Pedro and changes their state, diagnosis and photos while not handed back; reads services and staff; no access to customers or bikes. See [permissions](docs/permissions.md). |
+| `mechanic2@wheelhouse.cl` | `passwordmechanic2` | Mechanic (Juan) | The same as `mechanic1`, on the repairs assigned to Juan. See [permissions](docs/permissions.md). |
+| `orphan@wheelhouse.cl` | `passwordorphan123` | Counter, no staff member | The same as the counter; it belongs to no member of the staff. See [permissions](docs/permissions.md). |
+| `orphan.mechanic@wheelhouse.cl` | `passwordorphanmech1` | Mechanic, no staff member | Has no repairs of its own, so it reads none; reads services and staff. See [permissions](docs/permissions.md). |
 
-Setting Up the API Token
-Protected API endpoints require an HTTP Bearer Token stored in Rails encrypted credentials.
+An account created from the sign-up page has the default role, Counter.
 
-Open the credentials editor:
+A visitor with no session can read the list and the page of the services, and nothing else.
+A request that a role may not make answers `403`.
 
-EDITOR="nano" bundle exec rails credentials:edit
-Add the token key:
+## Emails in development
 
-api_bearer_token: "YOUR_SECRET_BEARER_TOKEN"
-Example cURL Commands
-Public Price List (GET /api/v1/services — No Token Required):
+Welcome and password-reset emails open in your browser (`letter_opener`), and the mailer previews
+are at <http://localhost:3000/rails/mailers>.
 
+## API
+
+The API lives under `/api/v1` on the same port (3000). It is not affected by the roles.
+
+* `GET /api/v1/services` — public price list, no token.
+* `GET /api/v1/repairs` — needs the header `Authorization: Bearer <token>`.
+
+The token is read from the encrypted credentials (`api_bearer_token`). The master key is not in the
+repository, so on a fresh clone create your own credentials:
+
+```bash
+rm config/credentials.yml.enc
+EDITOR="nano" bin/rails credentials:edit     # add:  api_bearer_token: "YOUR_SECRET_TOKEN"
+```
+
+```bash
 curl -i http://localhost:3000/api/v1/services
-Protected Repairs List (GET /api/v1/repairs — Requires Token):
+curl -i -H "Authorization: Bearer YOUR_SECRET_TOKEN" http://localhost:3000/api/v1/repairs
+```
 
-curl -i -H "Authorization: Bearer YOUR_SECRET_BEARER_TOKEN" http://localhost:3000/api/v1/repairs
+## Checks
+
+```bash
+bin/rails test      # test suite
+bin/brakeman        # security scan, no warnings expected
+```

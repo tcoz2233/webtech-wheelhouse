@@ -7,7 +7,7 @@
 <h1><%= @mechanic.name %></h1>
 
 <h3 class="mt-4">Reparaciones Asignadas</h3>
-<% if @mechanic.repairs.any? %>
+<% if @repairs.any? %>
   <table class="table align-middle">
     <thead>
       <tr>
@@ -18,10 +18,10 @@
       </tr>
     </thead>
     <tbody>
-      <% @mechanic.repairs.each do |repair| %>
+      <% @repairs.each do |repair| %>
         <tr>
-          <td><%= link_to "##{repair.id}", repair_path(repair), class: "fw-bold" %></td>
-          <td><%= link_to "#{repair.bike.brand} #{repair.bike.model}", bike_path(repair.bike) %></td>
+          <td><%= link_to_if policy(repair).show?, "##{repair.id}", repair_path(repair), class: "fw-bold" %></td>
+          <td><%= link_to_if policy(repair.bike).show?, "#{repair.bike.brand} #{repair.bike.model}", bike_path(repair.bike) %></td>
           <td><span class="badge bg-secondary"><%= repair.status %></span></td>
           <td><%= l(repair.promised_on, format: :short) %></td>
         </tr>
@@ -31,4 +31,3 @@
 <% else %>
   <p class="text-muted">Este mecánico no tiene reparaciones asignadas.</p>
 <% end %>
-<%= link_to "Delete", customer_path(@customer), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete customer '#{@customer.name}'?" }, class: "btn btn-danger" %>

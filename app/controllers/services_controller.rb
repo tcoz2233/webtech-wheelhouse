@@ -1,23 +1,32 @@
 class ServicesController < ApplicationController
+  # The list and the page stay public; ServicePolicy#index? and #show? allow a visitor.
   allow_unauthenticated_access only: [:index, :show]
   before_action :set_service, only: [:show, :edit, :update, :destroy]
 
   def index
-    @services = Service.by_name
+    authorize Service
+    @services = policy_scope(Service).by_name
   end
 
   def show
+    # Only the repairs the reader may read (same scope as the repairs index).
+    @repairs = policy_scope(Repair)
+                 .where(id: @service.repair_services.select(:repair_id))
+                 .includes(bike: :customer)
   end
 
   def new
     @service = Service.new
+    authorize @service
   end
 
   def edit
   end
 
   def create
-    @service = Service.new(service_params)
+    @service = Service.new
+    authorize @service
+    @service.assign_attributes(service_params)
     if @service.save
       redirect_to @service, notice: "Service '#{@service.name}' created successfully."
     else
@@ -45,6 +54,7 @@ class ServicesController < ApplicationController
 
   def set_service
     @service = Service.find(params[:id])
+    authorize @service
   rescue ActiveRecord::RecordNotFound
     render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
   end

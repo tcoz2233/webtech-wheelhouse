@@ -2,21 +2,27 @@ class BikesController < ApplicationController
   before_action :set_bike, only: [:show, :edit, :update, :destroy]
 
   def index
-    @bikes = Bike.includes(:customer).by_name
+    authorize Bike
+    @bikes = policy_scope(Bike).includes(:customer).by_name
   end
 
   def show
-    @bike
+    # Only the repairs the reader may read (same scope as the repairs index).
+    @repairs = policy_scope(Repair).where(bike_id: @bike.id)
   end
+
   def new
     @bike = Bike.new(customer_id: params[:customer_id])
+    authorize @bike
   end
 
   def edit
   end
 
   def create
-    @bike = Bike.new(bike_params)
+    @bike = Bike.new
+    authorize @bike
+    @bike.assign_attributes(bike_params)
     if @bike.save
       redirect_to @bike, notice: "Bike '#{@bike.serial_number}' created successfully."
     else
@@ -44,6 +50,7 @@ class BikesController < ApplicationController
 
   def set_bike
     @bike = Bike.find(params[:id])
+    authorize @bike
   rescue ActiveRecord::RecordNotFound
     render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
   end

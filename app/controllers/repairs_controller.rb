@@ -2,7 +2,8 @@ class RepairsController < ApplicationController
   before_action :set_repair, only: [:show, :edit, :update, :destroy]
 
   def index
-    @repairs = Repair.includes(:bike, :mechanic, :user).all
+    authorize Repair
+    @repairs = policy_scope(Repair).includes(:mechanic, bike: :customer)
   end
 
   def show
@@ -10,13 +11,16 @@ class RepairsController < ApplicationController
 
   def new
     @repair = Repair.new
+    authorize @repair
   end
 
   def edit
   end
 
   def create
-    @repair = Repair.new(repair_params)
+    @repair = Repair.new
+    authorize @repair
+    @repair.assign_attributes(permitted_attributes(@repair))
     @repair.user = Current.user
 
     if @repair.save
@@ -27,7 +31,7 @@ class RepairsController < ApplicationController
   end
 
   def update
-    if @repair.update(repair_params)
+    if @repair.update(permitted_attributes(@repair))
       redirect_to @repair, notice: "Repair updated successfully."
     else
       render :edit, status: :unprocessable_entity
@@ -41,11 +45,9 @@ class RepairsController < ApplicationController
 
   private
 
+  # Authorizes with the policy method that matches the action (show?, edit?, update?, destroy?).
   def set_repair
     @repair = Repair.find(params[:id])
-  end
-
-  def repair_params
-    params.expect(repair: [:bike_id, :mechanic_id, :promised_on, :status, :customer_agreed])
+    authorize @repair
   end
 end

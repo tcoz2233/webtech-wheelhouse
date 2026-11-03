@@ -2,7 +2,8 @@ class CustomersController < ApplicationController
   before_action :set_customer, only: [:show, :edit, :update, :destroy]
 
   def index
-    @customers = Customer.by_name
+    authorize Customer
+    @customers = policy_scope(Customer).by_name
   end
 
   def show
@@ -10,13 +11,16 @@ class CustomersController < ApplicationController
 
   def new
     @customer = Customer.new
+    authorize @customer
   end
 
   def edit
   end
 
   def create
-    @customer = Customer.new(customer_params)
+    @customer = Customer.new
+    authorize @customer
+    @customer.assign_attributes(customer_params)
     if @customer.save
       redirect_to @customer, notice: "Customer '#{@customer.name}' created successfully."
     else
@@ -44,6 +48,7 @@ class CustomersController < ApplicationController
 
   def set_customer
     @customer = Customer.find(params[:id])
+    authorize @customer
   rescue ActiveRecord::RecordNotFound
     render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
   end

@@ -1,6 +1,11 @@
 <% provide(:title, "Services catalog") %>
 
-<h1 class="mb-4">Services</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="mb-0">Services</h1>
+  <% if policy(Service).create? %>
+    <%= link_to "New Service", new_service_path, class: "btn btn-primary" %>
+  <% end %>
+</div>
 
 <% if @services.any? %>
   <table class="table table-striped align-middle">

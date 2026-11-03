@@ -1,62 +1,83 @@
-RepairService.destroy_all
-Repair.destroy_all
-Bike.destroy_all
-Customer.destroy_all
-Service.destroy_all
-User.destroy_all
-Mechanic.destroy_all
+# Idempotent: from an empty database it finishes without errors, and running it again
+# leaves the same number of rows in every table (nothing is destroyed, nothing is duplicated).
+# Accounts are only created when missing, so their passwords never change.
 
-owner_mechanic = Mechanic.find_or_create_by!(name: "Carlos Owner")
-counter_mechanic = Mechanic.find_or_create_by!(name: "Ana Counter")
-mechanic1 = Mechanic.find_or_create_by!(name: "Pedro Mechanic")
-mechanic2 = Mechanic.find_or_create_by!(name: "Juan Mechanic")
+# --- Staff ---------------------------------------------------------------
+owner_staff   = Mechanic.find_or_create_by!(name: "Carlos Owner")
+counter_staff = Mechanic.find_or_create_by!(name: "Ana Counter")
+pedro         = Mechanic.find_or_create_by!(name: "Pedro Mechanic")
+juan          = Mechanic.find_or_create_by!(name: "Juan Mechanic")
 
-User.find_or_create_by!(email_address: "owner@wheelhouse.cl") do |u|
-  u.password = "passwordowner123"
-  u.role = "owner"
-  u.mechanic = owner_mechanic
+# --- Accounts ------------------------------------------------------------
+seed_user = lambda do |email, password, role, staff|
+  User.find_or_create_by!(email_address: email) do |u|
+    u.password = password
+    u.role = role
+    u.mechanic = staff
+  end
 end
 
-User.find_or_create_by!(email_address: "counter@wheelhouse.cl") do |u|
-  u.password = "passwordcounter123"
-  u.role = "counter"
-  u.mechanic = counter_mechanic
+owner_user = seed_user.call("owner@wheelhouse.cl",    "passwordowner123",   "owner",    owner_staff)
+seed_user.call("counter@wheelhouse.cl",               "passwordcounter123", "counter",  counter_staff)
+seed_user.call("mechanic1@wheelhouse.cl",             "passwordmechanic1",  "mechanic", pedro)
+seed_user.call("mechanic2@wheelhouse.cl",             "passwordmechanic2",  "mechanic", juan)
+seed_user.call("orphan@wheelhouse.cl",                "passwordorphan123",  "counter",  nil)
+# A mechanic account that belongs to no member of the staff: it has no repairs of its own.
+seed_user.call("orphan.mechanic@wheelhouse.cl",       "passwordorphanmech1", "mechanic", nil)
+
+# --- Services ------------------------------------------------------------
+tune_up = Service.find_or_create_by!(name: "Tune-up") do |s|
+  s.current_price = 35.00
+  s.is_active = true
+end
+flat_tire = Service.find_or_create_by!(name: "Flat tire repair") do |s|
+  s.current_price = 15.00
+  s.is_active = true
 end
 
-User.find_or_create_by!(email_address: "mechanic1@wheelhouse.cl") do |u|
-  u.password = "passwordmechanic1"
-  u.role = "mechanic"
-  u.mechanic = mechanic1
+# --- Customers and bikes -------------------------------------------------
+maria = Customer.find_or_create_by!(name: "Maria Gomez") { |c| c.phone = "+56911111111" }
+jose  = Customer.find_or_create_by!(name: "Jose Perez")  { |c| c.phone = "+56922222222" }
+
+seed_bike = lambda do |serial, brand, model, color, customer|
+  Bike.find_or_create_by!(serial_number: serial) do |b|
+    b.brand = brand
+    b.model = model
+    b.color = color
+    b.customer = customer
+  end
 end
 
-User.find_or_create_by!(email_address: "orphan@wheelhouse.cl") do |u|
-  u.password = "passwordorphan123"
-  u.role = "counter"
-  u.mechanic = nil
+bike1 = seed_bike.call("SN1001", "Trek",        "Marlin",  "Red",    maria)
+bike2 = seed_bike.call("SN1002", "Specialized", "Sirrus",  "Blue",   jose)
+bike3 = seed_bike.call("SN1003", "Giant",       "Talon",   "Black",  maria)
+bike4 = seed_bike.call("SN1004", "Cannondale",  "Quick",   "Green",  jose)
+
+# --- Repairs -------------------------------------------------------------
+# Each mechanic has two repairs: one handed back (delivered) and one that is not.
+# One repair has no mechanic assigned.
+seed_repair = lambda do |bike, mechanic, status, promised_on|
+  Repair.find_or_create_by!(bike: bike, mechanic: mechanic, status: status) do |r|
+    r.promised_on = promised_on
+    r.user = owner_user
+    r.customer_agreed = true
+    r.handed_back_at = Time.current if status == "delivered"
+  end
 end
 
-service1 = Service.find_or_create_by!(name: "Tune-up", current_price: 35.00, is_active: true)
-service2 = Service.find_or_create_by!(name: "Flat tire repair", current_price: 15.00, is_active: true)
+pedro_done = seed_repair.call(bike1, pedro, "delivered",   Date.current - 7)
+pedro_open   = seed_repair.call(bike3, pedro, "in_progress", Date.current - 2) # overdue
+juan_done    = seed_repair.call(bike2, juan,  "delivered",   Date.current - 5)
+juan_open    = seed_repair.call(bike4, juan,  "in_progress", Date.current + 5)
+seed_repair.call(bike2, nil,   "received",    Date.current + 7)
 
-customer1 = Customer.find_or_create_by!(name: "Maria Gomez", phone: "+56911111111")
-customer2 = Customer.find_or_create_by!(name: "Jose Perez", phone: "+56922222222")
-
-bike1 = Bike.find_or_create_by!(serial_number: "SN1001", brand: "Trek", model: "Marlin", color: "Red", customer: customer1)
-bike2 = Bike.find_or_create_by!(serial_number: "SN1002", brand: "Specialized", model: "Sirrus", color: "Blue", customer: customer2)
-
-admin_user = User.find_by(email_address: "owner@wheelhouse.cl")
-
-repair1 = Repair.find_or_create_by!(bike: bike1, promised_on: 3.days.from_now, status: "received") do |r|
-  r.mechanic = mechanic1
-  r.user = admin_user
-  r.customer_agreed = true
+[
+  [pedro_done, tune_up],
+  [pedro_open, flat_tire],
+  [juan_done,  flat_tire],
+  [juan_open,  tune_up]
+].each do |repair, service|
+  RepairService.find_or_create_by!(repair: repair, service: service) do |line|
+    line.price_charged = service.current_price
+  end
 end
-
-repair2 = Repair.find_or_create_by!(bike: bike2, promised_on: 5.days.from_now, status: "in_progress") do |r|
-  r.mechanic = mechanic2
-  r.user = nil
-  r.customer_agreed = true
-end
-
-RepairService.find_or_create_by!(repair: repair1, service: service1, price_charged: service1.current_price)
-RepairService.find_or_create_by!(repair: repair2, service: service2, price_charged: service2.current_price)
